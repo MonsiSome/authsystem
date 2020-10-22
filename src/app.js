@@ -22,8 +22,10 @@ function clickHandler(event) {
   event.preventDefault();
   userStatusMessage.innerHTML = '';
 
-  if(!JSON.parse(localStorage.getItem('access_token'))
-    || !JSON.parse(localStorage.getItem('refresh_token'))) {
+  if(
+    !JSON.parse(localStorage.getItem('access_token')) ||
+    !JSON.parse(localStorage.getItem('refresh_token'))
+  ) {
     requestStatus.innerHTML = 'Log in, please...';
     return;
   }
@@ -33,6 +35,7 @@ function clickHandler(event) {
   
     User.getAccess()
       .then(response => {
+        console.log(response);
         requestStatus.innerHTML = '';
         userStatusMessage.innerHTML = `${response.data.body.message}`;
         response.data.body.status === 'error' ? userStatusMessage.style.color = 'darkred'
@@ -46,7 +49,8 @@ function clickHandler(event) {
 
     User.doRefresh()
       .then(response => {
-        localStorage.setItem('access_token', JSON.stringify(response.data.body.access_token));
+        console.log(response);
+        localStorage.setItem('access_token', response.data.body.access_token);
         userStatusMessage.innerHTML = 'Refershed';
         requestStatus.innerHTML = '';
       })
@@ -71,9 +75,16 @@ function executeSubmit(event) {
 
     User.doLogin(email.value, password.value)
       .then(response => {
+        console.log(response);
+        console.log(!!response.data['status_code']);
+        if (!!response.data['status_code']) {
+          userStatusMessage.innerHTML = `${response.data.body.message}`;
+          userStatusMessage.style.color = 'darkred';
+          return response;
+        }
         if (response.data.status !== 'error') {
-          localStorage.setItem('access_token', JSON.stringify(response.data.body.access_token));
-          localStorage.setItem('refresh_token', JSON.stringify(response.data.body.refresh_token));
+          localStorage.setItem('access_token', response.data.body.access_token);
+          localStorage.setItem('refresh_token', response.data.body.refresh_token);
           userStatusMessage.innerHTML = 'Logged in';
         } else {
           userStatusMessage.innerHTML = `${response.data.message}`;
@@ -90,6 +101,7 @@ function executeSubmit(event) {
 
     User.doRegistration({ 'email': email.value, 'password': password.value })
       .then(response => {
+        console.log(response);
         if (response.data.status !== 'error') {
           email.value = '';
           password.value = '';
@@ -110,8 +122,8 @@ function executeSubmit(event) {
 }
 
 function clearTokens() {
-  localStorage.setItem('access_token', JSON.stringify(''));
-  localStorage.setItem('refresh_token', JSON.stringify(''));
+  localStorage.clear('access_token');
+  localStorage.clear('refresh_token');
 }
 
 //это я так, для себя
