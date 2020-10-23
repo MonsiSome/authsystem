@@ -21,10 +21,12 @@ refresh.addEventListener('click', clickHandler);
 function clickHandler(event) {
   event.preventDefault();
   userStatusMessage.innerHTML = '';
-
+  userStatusMessage.style.color = 'black';
+  console.log('access_token', localStorage.getItem('access_token'));
+  console.log('refresh_token', localStorage.getItem('refresh_token'));
   if(
-    !JSON.parse(localStorage.getItem('access_token')) ||
-    !JSON.parse(localStorage.getItem('refresh_token'))
+    !localStorage.getItem('access_token') ||
+    !localStorage.getItem('refresh_token')
   ) {
     requestStatus.innerHTML = 'Log in, please...';
     return;
@@ -50,8 +52,14 @@ function clickHandler(event) {
     User.doRefresh()
       .then(response => {
         console.log(response);
-        localStorage.setItem('access_token', response.data.body.access_token);
-        userStatusMessage.innerHTML = 'Refershed';
+        if (response.data.statusCode === 200) {
+          localStorage.setItem('access_token', response.data.body.access_token);
+          userStatusMessage.innerHTML = 'Refershed';
+        } else {
+          userStatusMessage.innerHTML = `${response.data.body.message}`;
+          userStatusMessage.style.color = 'darkred';
+          clearTokens();
+        }
         requestStatus.innerHTML = '';
       })
       .catch(function (error) {
@@ -76,7 +84,7 @@ function executeSubmit(event) {
     User.doLogin(email.value, password.value)
       .then(response => {
         console.log(response);
-        console.log(!!response.data['status_code']);
+        console.log('status_code', !!response.data['status_code']);
         if (!!response.data['status_code']) {
           userStatusMessage.innerHTML = `${response.data.body.message}`;
           userStatusMessage.style.color = 'darkred';

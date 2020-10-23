@@ -4,13 +4,13 @@ export class User {
 
   static getAccess() {
     return axios.get('/me', { 
-      headers: { 'Authorization': `Bearer ${JSON.parse(localStorage.getItem('access_token'))}`} 
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}`} 
     });
   };
 
   static doRefresh() {
     return axios.post('/refresh', undefined, { 
-      headers: { 'Authorization': `Bearer ${JSON.parse(localStorage.getItem('refresh_token'))}`} 
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('refresh_token')}`} 
     });
   };
 
