@@ -11,13 +11,13 @@
   <button class="access">Get access</button>
   <button class="refresh">Refresh access</button>
 
-  <form>
+  <form method="POST">
     <div>
-      <input type="email" id="email" required>
+      <input type="email" id="email" placeholder="email@gmail.com" required>
       <label for="email">Email</label>
     </div>
     <div>
-      <input type="password" id="password" required minlength="6">
+      <input type="password" id="password" placeholder="******" required minlength="6">
       <label for="password">Password</label>
     </div>
     <input type="submit" class="login" name="login" value="Login">

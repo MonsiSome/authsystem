@@ -77,6 +77,7 @@ function executeSubmit(event) {
 
   const email = event.target.querySelector('#email');
   const password = event.target.querySelector('#password');
+  const newUser = { 'email': email.value, 'password': password.value };
 
   if (event.submitter.defaultValue === 'Login') {
     requestStatus.innerHTML = 'Loggining...';
@@ -94,26 +95,28 @@ function executeSubmit(event) {
           localStorage.setItem('access_token', response.data.body.access_token);
           localStorage.setItem('refresh_token', response.data.body.refresh_token);
           userStatusMessage.innerHTML = 'Logged in';
+          email.value = '';
+          password.value = '';
         } else {
           userStatusMessage.innerHTML = `${response.data.message}`;
           userStatusMessage.style.color = 'darkred';
         }
-        return response;
+        requestStatus.innerHTML = '';
+        // return response;
       })
-      .then(requestStatus.innerHTML = '')
+      // .then(requestStatus.innerHTML = '')
       .catch(function (error) {
         requestStatus.innerHTML = `${error.message}`;
       });
   } else {
     requestStatus.innerHTML = 'Registering...';
 
-    User.doRegistration({ 'email': email.value, 'password': password.value })
+    User.doRegistration(newUser)
       .then(response => {
         console.log(response);
         if (response.data.status !== 'error') {
           email.value = '';
           password.value = '';
-          addToLocalStorage(JSON.parse(response.config.data));
         }
         return response;
       })
@@ -132,15 +135,4 @@ function executeSubmit(event) {
 function clearTokens() {
   localStorage.clear('access_token');
   localStorage.clear('refresh_token');
-}
-
-//это я так, для себя
-function addToLocalStorage(user) {
-  const allUsers = getUsersFromLocalStorage();
-  allUsers.push(user);
-  localStorage.setItem('user', JSON.stringify(allUsers));
-}
-
-function getUsersFromLocalStorage() {
-  return JSON.parse(localStorage.getItem('user') || '[]');
 }
